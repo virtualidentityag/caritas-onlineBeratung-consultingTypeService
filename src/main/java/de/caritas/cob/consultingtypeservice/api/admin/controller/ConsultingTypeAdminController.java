@@ -5,9 +5,9 @@ import de.caritas.cob.consultingtypeservice.api.admin.service.ConsultingTypeAdmi
 import de.caritas.cob.consultingtypeservice.api.model.ConsultingTypeAdminResultDTO;
 import de.caritas.cob.consultingtypeservice.api.model.RootDTO;
 import de.caritas.cob.consultingtypeservice.generated.api.admin.controller.ConsultingtypeadminApi;
-import io.swagger.annotations.Api;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller to handle all consulting types admin requests. */
 @RestController
+@Tag(name = "consulting-type-admin-controller")
 @RequiredArgsConstructor
-@Api(tags = "consulting-type-admin-controller")
 public class ConsultingTypeAdminController implements ConsultingtypeadminApi {
 
   private final @NonNull ConsultingTypeAdminService consultingTypeAdminService;

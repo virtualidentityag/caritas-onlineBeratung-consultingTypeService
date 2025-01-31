@@ -11,7 +11,7 @@ import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class HelperMethods {
   }
 
   public static String getConsultingTypeSettingsAsJsonString() throws IOException {
-    return new String(Files.readAllBytes(Paths.get(FILE_VALID_COMPLETE_CONSULTING_TYPE)));
+    return new String(Files.readAllBytes(Path.of(FILE_VALID_COMPLETE_CONSULTING_TYPE)));
   }
 
   private static ConsultingType loadConsultingType(String filename) throws IOException {
@@ -43,6 +43,6 @@ public class HelperMethods {
   }
 
   public static String loadConsultingTypeGroupResponseAsJsonString() throws IOException {
-    return new String(Files.readAllBytes(Paths.get(FILE_CONSULTING_TYPE_GROUP_RESPONSE_JSON)));
+    return new String(Files.readAllBytes(Path.of(FILE_CONSULTING_TYPE_GROUP_RESPONSE_JSON)));
   }
 }

@@ -1,31 +1,31 @@
 package de.caritas.cob.consultingtypeservice.config;
 
-import de.caritas.cob.consultingtypeservice.api.auth.RoleAuthorizationAuthorityMapper;
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import de.caritas.cob.consultingtypeservice.config.security.AuthorisationService;
+import de.caritas.cob.consultingtypeservice.config.security.JwtAuthConverter;
+import de.caritas.cob.consultingtypeservice.config.security.JwtAuthConverterProperties;
 import de.caritas.cob.consultingtypeservice.filter.HttpTenantFilter;
 import de.caritas.cob.consultingtypeservice.filter.StatelessCsrfFilter;
-import javax.annotation.Nullable;
-import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
-import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
+import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 
 /** Provides the Security configuration. */
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @EnableWebSecurity
-public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
   @Value("${csrf.cookie.property}")
   private String csrfCookieProperty;
@@ -38,6 +38,9 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
   @Autowired(required = false)
   private @Nullable HttpTenantFilter tenantFilter;
+
+  @Autowired AuthorisationService authorisationService;
+  @Autowired JwtAuthConverterProperties jwtAuthConverterProperties;
 
   public static final String[] WHITE_LIST =
       new String[] {
@@ -54,61 +57,62 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
       };
 
   /** Configure spring security filter chain */
-  @Override
-  protected void configure(final HttpSecurity http) throws Exception {
+  @Bean
+  SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     var httpSecurity =
-        http.csrf()
-            .disable()
+        http.csrf(csrf -> csrf.disable())
             .addFilterBefore(
                 new StatelessCsrfFilter(csrfCookieProperty, csrfHeaderProperty), CsrfFilter.class);
 
     httpSecurity = enableTenantFilterIfMultitenancyEnabled(httpSecurity);
-
     httpSecurity
-        .csrf()
-        .disable()
-        .authenticationProvider(keycloakAuthenticationProvider())
-        .addFilterBefore(keycloakAuthenticationProcessingFilter(), BasicAuthenticationFilter.class)
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
-        .and()
-        .authorizeRequests()
-        .requestMatchers(new AntPathRequestMatcher("/settings"))
-        .permitAll()
-        .requestMatchers(new AntPathRequestMatcher("/settings/*"))
-        .permitAll()
-        .requestMatchers(new AntPathRequestMatcher("/topic/public"))
-        .permitAll()
-        .requestMatchers(new AntPathRequestMatcher("/topic/public/*"))
-        .permitAll()
-        .requestMatchers(new AntPathRequestMatcher("/topic"))
-        .authenticated()
-        .requestMatchers(new AntPathRequestMatcher("/topic/*"))
-        .authenticated()
-        .requestMatchers(new AntPathRequestMatcher("/topicadmin"))
-        .authenticated()
-        .requestMatchers(new AntPathRequestMatcher("/topicadmin/*"))
-        .authenticated()
-        .requestMatchers(new AntPathRequestMatcher("/settingsadmin"))
-        .authenticated()
-        .requestMatchers(new AntPathRequestMatcher("/settingsadmin/*"))
-        .authenticated()
-        .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/topic")))
-        .permitAll()
-        .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/topic/*")))
-        .permitAll()
-        .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/topicadmin")))
-        .permitAll()
-        .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/topicadmin/*")))
-        .permitAll()
-        .anyRequest()
-        .permitAll()
-        .and()
-        .headers()
-        .xssProtection()
-        .and()
-        .contentSecurityPolicy("script-src 'self'");
+        .sessionManagement(
+            management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            requests ->
+                requests
+                    .requestMatchers(new AntPathRequestMatcher("/settings"))
+                    .permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/settings/*"))
+                    .permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/topic/public"))
+                    .permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/topic/public/*"))
+                    .permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/topic"))
+                    .authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/topic/*"))
+                    .authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/topicadmin"))
+                    .authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/topicadmin/*"))
+                    .authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/settingsadmin"))
+                    .authenticated()
+                    .requestMatchers(new AntPathRequestMatcher("/settingsadmin/*"))
+                    .authenticated()
+                    .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/topic")))
+                    .permitAll()
+                    .requestMatchers(
+                        new NegatedRequestMatcher(new AntPathRequestMatcher("/topic/*")))
+                    .permitAll()
+                    .requestMatchers(
+                        new NegatedRequestMatcher(new AntPathRequestMatcher("/topicadmin")))
+                    .permitAll()
+                    .requestMatchers(
+                        new NegatedRequestMatcher(new AntPathRequestMatcher("/topicadmin/*")))
+                    .permitAll()
+                    .anyRequest()
+                    .permitAll())
+        .headers(
+            headers ->
+                headers
+                    .xssProtection(withDefaults())
+                    .contentSecurityPolicy(policy -> policy.policyDirectives("script-src 'self'")));
+
+    httpSecurity.oauth2ResourceServer(
+        server -> server.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter())));
+    return http.build();
   }
 
   /**
@@ -124,24 +128,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     return httpSecurity;
   }
 
-  @Override
-  protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-    return new NullAuthenticatedSessionStrategy();
-  }
-
-  @Autowired
-  public void configureGlobal(
-      final AuthenticationManagerBuilder auth, RoleAuthorizationAuthorityMapper authorityMapper) {
-    final KeycloakAuthenticationProvider keycloakAuthenticationProvider =
-        keycloakAuthenticationProvider();
-    keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(authorityMapper);
-    auth.authenticationProvider(keycloakAuthenticationProvider);
-  }
-
-  @Override
-  protected KeycloakAuthenticationProvider keycloakAuthenticationProvider() {
-    var provider = new KeycloakAuthenticationProvider();
-    provider.setGrantedAuthoritiesMapper(new RoleAuthorizationAuthorityMapper());
-    return provider;
+  @Bean
+  JwtAuthConverter jwtAuthConverter() {
+    return new JwtAuthConverter(jwtAuthConverterProperties, authorisationService);
   }
 }

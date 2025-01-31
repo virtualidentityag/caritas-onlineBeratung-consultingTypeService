@@ -62,7 +62,7 @@ public class ConsultingTypeMongoTenantAwareRepositoryService
 
     if (byId.isEmpty()) {
       throw new NotFoundException(
-          String.format("Consulting type with id %s not found.", consultingTypeId));
+          "Consulting type with id %s not found.".formatted(consultingTypeId));
     }
     return byId.get();
   }
@@ -87,9 +87,7 @@ public class ConsultingTypeMongoTenantAwareRepositoryService
     return findBySlug(slug).stream()
         .findFirst()
         .orElseThrow(
-            () ->
-                new NotFoundException(
-                    String.format("Consulting type with slug %s not found.", slug)));
+            () -> new NotFoundException("Consulting type with slug %s not found.".formatted(slug)));
   }
 
   private List<ConsultingType> findBySlug(String slug) {
@@ -113,9 +111,8 @@ public class ConsultingTypeMongoTenantAwareRepositoryService
     if (isConsultingTypeWithGivenIdPresent(consultingType)
         || isConsultingTypeWithGivenSlugPresent(consultingType)) {
       LogService.logWarning(
-          String.format(
-              "Could not add consulting type. id %s or slug %s is not unique",
-              consultingType.getId(), consultingType.getSlug()));
+          "Could not add consulting type. id %s or slug %s is not unique"
+              .formatted(consultingType.getId(), consultingType.getSlug()));
       return Optional.empty();
     } else {
       final ConsultingTypeEntity consultingTypeEntity = new ConsultingTypeEntity();

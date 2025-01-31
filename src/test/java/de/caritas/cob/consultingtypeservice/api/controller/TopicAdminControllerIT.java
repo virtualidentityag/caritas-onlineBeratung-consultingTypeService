@@ -1,7 +1,7 @@
 package de.caritas.cob.consultingtypeservice.api.controller;
 
 import static de.caritas.cob.consultingtypeservice.api.auth.UserRole.TOPIC_ADMIN;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
@@ -109,7 +109,7 @@ class TopicAdminControllerIT {
     final Authentication authentication = givenMockAuthentication(UserRole.TOPIC_ADMIN);
     mockMvc
         .perform(
-            put(String.format(TopicPathConstants.PATH_PUT_TOPIC_BY_ID, "1"))
+            put(TopicPathConstants.PATH_PUT_TOPIC_BY_ID.formatted("1"))
                 .with(authentication(authentication))
                 .contentType(APPLICATION_JSON)
                 .content(payload)
@@ -139,7 +139,7 @@ class TopicAdminControllerIT {
     final Authentication authentication = givenMockAuthentication(UserRole.TOPIC_ADMIN);
     mockMvc
         .perform(
-            put(String.format(TopicPathConstants.PATH_PUT_TOPIC_BY_ID, "1"))
+            put(TopicPathConstants.PATH_PUT_TOPIC_BY_ID.formatted("1"))
                 .with(authentication(authentication))
                 .contentType(APPLICATION_JSON)
                 .content(payload)
@@ -279,7 +279,7 @@ class TopicAdminControllerIT {
     final AuthenticationMockBuilder builder = new AuthenticationMockBuilder();
     mockMvc
         .perform(
-            get(String.format(TopicPathConstants.ADMIN_PATH_GET_TOPIC_BY_ID, 1))
+            get(TopicPathConstants.ADMIN_PATH_GET_TOPIC_BY_ID.formatted(1))
                 .with(authentication(builder.withUserRole(TOPIC_ADMIN.getValue()).build()))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
