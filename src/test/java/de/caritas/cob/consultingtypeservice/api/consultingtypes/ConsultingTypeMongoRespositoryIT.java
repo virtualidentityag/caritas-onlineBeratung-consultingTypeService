@@ -8,34 +8,71 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.api.model.ConsultingTypeEntity;
 import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.mongo.config.MongodConfig;
+import de.flapdoodle.embed.process.runtime.Network;
 import java.io.IOException;
 import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
-@DataMongoTest()
-@ContextConfiguration(classes = ConsultingTypeServiceApplication.class)
+@DataMongoTest
+@ContextConfiguration(classes = ConsultingTypeServiceApplication.class, initializers = ConsultingTypeMongoRespositoryIT.Initializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 @TestPropertySource(properties = "multitenancy.enabled=true")
 @TestPropertySource(
     properties =
         "consulting.types.json.path=src/test/resources/consulting-type-settings-tenant-specific")
-public class ConsultingTypeMongoRespositoryIT {
+class ConsultingTypeMongoRespositoryIT {
 
   private final String MONGO_COLLECTION_NAME = "consulting_types";
+
+  private static MongodExecutable mongodExecutable;
+
+  private static int mongoPort;
+
 
   @Autowired private ConsultingTypeRepository consultingTypeRepository;
 
   @Autowired MongoTemplate mongoTemplate;
 
+  @BeforeAll
+  static void setUp() throws IOException {
+    MongodStarter starter = MongodStarter.getDefaultInstance();
+    mongoPort = 27017;
+    MongodConfig mongodConfig = MongodConfig.builder()
+        .version(Version.Main.V4_0)
+        .net(new Net(mongoPort, Network.localhostIsIPv6()))
+        .build();
+    mongodExecutable = starter.prepare(mongodConfig);
+    mongodExecutable.start();
+  }
+
+  @AfterAll
+  static void tearDown() {
+    if (mongodExecutable != null) {
+      mongodExecutable.stop();
+    }
+  }
+
   @BeforeEach
-  public void initializeMongoDbWithData() throws IOException {
+  void initializeMongoDbWithData() throws IOException {
     mongoTemplate.dropCollection(MONGO_COLLECTION_NAME);
     insertJsonFromFilename("consulting-type-0.json");
     insertJsonFromFilename("consulting-type-1.json");
@@ -53,7 +90,7 @@ public class ConsultingTypeMongoRespositoryIT {
   }
 
   @Test
-  public void findByConsultingTypeId_Should_ReturnCorrectConsultingType() {
+  void findByConsultingTypeId_Should_ReturnCorrectConsultingType() {
     // given
     Integer consultingTypeId = 10;
     String slug = "consultingtype10";
@@ -67,7 +104,7 @@ public class ConsultingTypeMongoRespositoryIT {
   }
 
   @Test
-  public void findBySlug_Should_ReturnCorrectConsultingTyp() {
+  void findBySlug_Should_ReturnCorrectConsultingTyp() {
     // given
     Integer consultingTypeId = 10;
     String slug = "consultingtype10";
@@ -81,10 +118,20 @@ public class ConsultingTypeMongoRespositoryIT {
   }
 
   @Test
-  public void findAll_Should_ReturnAllConsultingTypes() {
+  void findAll_Should_ReturnAllConsultingTypes() {
     // when
     List<ConsultingTypeEntity> result = consultingTypeRepository.findAll();
     // then
     assertThat(result).hasSize(3);
+  }
+
+  static class Initializer implements
+      ApplicationContextInitializer<ConfigurableApplicationContext> {
+    @Override
+    public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+      TestPropertyValues.of(
+          "spring.data.mongodb.uri=mongodb://localhost:" + mongoPort + "/test"
+      ).applyTo(configurableApplicationContext.getEnvironment());
+    }
   }
 }
