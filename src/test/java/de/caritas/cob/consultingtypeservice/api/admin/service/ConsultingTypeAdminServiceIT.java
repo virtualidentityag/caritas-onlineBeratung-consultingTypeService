@@ -67,8 +67,7 @@ class ConsultingTypeAdminServiceIT {
   }
 
   @Test
-  void
-      findConsultingTypes_Should_returnPaginatedEntities_When_paginationParamsAreSplitted() {
+  void findConsultingTypes_Should_returnPaginatedEntities_When_paginationParamsAreSplitted() {
     List<ExtendedConsultingTypeResponseDTO> firstPage =
         this.consultingTypeAdminService.findConsultingTypes(0, 4).getEmbedded();
     List<ExtendedConsultingTypeResponseDTO> secondPage =
@@ -95,8 +94,7 @@ class ConsultingTypeAdminServiceIT {
   }
 
   @Test
-  void
-      findConsultingTypes_Should_returnAllConsultingTypes_When_ProvidedWithMaxPerPagesParam() {
+  void findConsultingTypes_Should_returnAllConsultingTypes_When_ProvidedWithMaxPerPagesParam() {
     List<ExtendedConsultingTypeResponseDTO> page =
         this.consultingTypeAdminService.findConsultingTypes(0, Integer.MAX_VALUE).getEmbedded();
 

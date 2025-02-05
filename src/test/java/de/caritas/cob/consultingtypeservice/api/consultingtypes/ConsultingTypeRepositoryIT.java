@@ -2,24 +2,43 @@ package de.caritas.cob.consultingtypeservice.api.consultingtypes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
+import java.io.IOException;
 import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
+@ContextConfiguration(
+    classes = ConsultingTypeServiceApplication.class,
+    initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
-public class ConsultingTypeRespositoryIT {
+class ConsultingTypeRepositoryIT {
 
   @Autowired private ConsultingTypeLoader consultingTypeLoader;
   @Autowired private ConsultingTypeRepositoryService consultingTypeRepositoryService;
 
+  @BeforeAll
+  static void setUp() throws IOException {
+    MongoTestInitializer.setUp();
+  }
+
+  @AfterAll
+  static void tearDown() {
+    MongoTestInitializer.tearDown();
+  }
+
   @Test
-  public void getConsultingTypeById_Should_ReturnCorrectConsultingType() {
+  void getConsultingTypeById_Should_ReturnCorrectConsultingType() {
 
     Integer consultingTypeId = 0;
     String slug = "consultingtype0";
@@ -29,7 +48,7 @@ public class ConsultingTypeRespositoryIT {
   }
 
   @Test
-  public void getConsultingTypeBySlug_Should_ReturnCorrectConsultingType() {
+  void getConsultingTypeBySlug_Should_ReturnCorrectConsultingType() {
 
     Integer consultingTypeId = 0;
     String slug = "consultingtype0";
@@ -39,7 +58,7 @@ public class ConsultingTypeRespositoryIT {
   }
 
   @Test
-  public void getListOfConsultingTypes_Should_ReturnCompleteListOfConsultingTypes() {
+  void getListOfConsultingTypes_Should_ReturnCompleteListOfConsultingTypes() {
 
     List<ConsultingType> result = consultingTypeRepositoryService.getListOfConsultingTypes();
     assertEquals(5, result.size());

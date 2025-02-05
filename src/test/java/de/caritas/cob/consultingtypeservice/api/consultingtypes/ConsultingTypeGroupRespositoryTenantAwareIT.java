@@ -22,15 +22,13 @@ import org.springframework.test.context.TestPropertySource;
 @AutoConfigureMockMvc
 @TestPropertySource(properties = "spring.profiles.active=testing")
 @TestPropertySource(properties = "multitenancy.enabled=true")
-@ContextConfiguration(
-    initializers = MongoTestInitializer.class)
+@ContextConfiguration(initializers = MongoTestInitializer.class)
 @TestPropertySource(
     properties =
         "consulting.types.json.path=src/test/resources/consulting-type-settings-tenant-specific")
 class ConsultingTypeGroupRespositoryTenantAwareIT {
 
-  @Autowired
-  private ConsultingTypeGroupRepository consultingTypeGroupRepository;
+  @Autowired private ConsultingTypeGroupRepository consultingTypeGroupRepository;
 
   @BeforeAll
   static void setUp() throws IOException {

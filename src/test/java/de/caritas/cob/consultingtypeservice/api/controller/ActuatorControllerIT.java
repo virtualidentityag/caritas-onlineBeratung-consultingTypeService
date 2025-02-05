@@ -35,8 +35,7 @@ import org.springframework.web.context.WebApplicationContext;
 @TestPropertySource(properties = "spring.profiles.active=testing")
 class ActuatorControllerIT {
 
-  @Autowired
-  private WebApplicationContext context;
+  @Autowired private WebApplicationContext context;
 
   private MockMvc mockMvc;
 
@@ -76,7 +75,6 @@ class ActuatorControllerIT {
 
   @Configuration
   static class TestConfig {
-    @MockBean
-    private JwtDecoder jwtDecoder;
+    @MockBean private JwtDecoder jwtDecoder;
   }
 }

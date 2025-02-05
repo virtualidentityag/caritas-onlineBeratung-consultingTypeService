@@ -185,7 +185,7 @@ class TopicAdminControllerIT {
   }
 
   @Test
-  void createTopic_Should_returnForbidden_When_calledWithValidCreateParamsButAsUnauthenticatedUser()
+  void createTopic_Should_returnUnauthorized_When_calledWithValidCreateParamsButAsUnauthenticatedUser()
       throws Exception {
     final EasyRandom easyRandom = new EasyRandom();
     final TopicMultilingualDTO topicDTO = easyRandom.nextObject(TopicMultilingualDTO.class);
@@ -193,7 +193,7 @@ class TopicAdminControllerIT {
     mockMvc
         .perform(
             post(TopicPathConstants.ADMIN_ROOT_PATH).content(payload).contentType(APPLICATION_JSON))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -256,11 +256,11 @@ class TopicAdminControllerIT {
   }
 
   @Test
-  void save_Should_ReturnForbidden_IfUserIsAuthenticatedButDoesNotHavePermission()
+  void save_Should_ReturnUnauthorized_IfUserIsAuthenticatedButDoesNotHavePermission()
       throws Exception {
     mockMvc
         .perform(post(TopicPathConstants.ADMIN_ROOT_PATH).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -309,11 +309,11 @@ class TopicAdminControllerIT {
   }
 
   @Test
-  void getTopicList_Should_ReturnForbidden_When_UserIsNotAuthenticated() throws Exception {
+  void getTopicList_Should_ReturnUnauthorized_When_UserIsNotAuthenticated() throws Exception {
     mockMvc
         .perform(
             get(TopicPathConstants.ADMIN_PATH_GET_TOPIC_LIST).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   private Authentication givenMockAuthentication(final UserRole userRole) {

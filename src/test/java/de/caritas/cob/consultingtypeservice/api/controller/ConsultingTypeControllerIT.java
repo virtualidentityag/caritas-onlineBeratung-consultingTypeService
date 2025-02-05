@@ -57,8 +57,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ContextConfiguration(
-    initializers = MongoTestInitializer.class)
+@ContextConfiguration(initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 class ConsultingTypeControllerIT {
 

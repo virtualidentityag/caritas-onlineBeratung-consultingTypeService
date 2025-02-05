@@ -11,10 +11,11 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class MongoTestInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class MongoTestInitializer
+    implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
   private static MongodExecutable mongodExecutable;
-  private final static int mongoPort = 27017;
+  private static final int mongoPort = 27017;
 
   @Override
   public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
@@ -24,10 +25,11 @@ public class MongoTestInitializer implements ApplicationContextInitializer<Confi
 
   public static void setUp() throws IOException {
     MongodStarter starter = MongodStarter.getDefaultInstance();
-    MongodConfig mongodConfig = MongodConfig.builder()
-        .version(Version.Main.V4_0)
-        .net(new Net(mongoPort, Network.localhostIsIPv6()))
-        .build();
+    MongodConfig mongodConfig =
+        MongodConfig.builder()
+            .version(Version.Main.V4_0)
+            .net(new Net(mongoPort, Network.localhostIsIPv6()))
+            .build();
     mongodExecutable = starter.prepare(mongodConfig);
     mongodExecutable.start();
   }
