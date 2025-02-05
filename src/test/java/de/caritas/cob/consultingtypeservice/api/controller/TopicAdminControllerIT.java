@@ -24,11 +24,15 @@ import de.caritas.cob.consultingtypeservice.api.util.JsonConverter;
 import de.caritas.cob.consultingtypeservice.api.util.MultilingualTopicTestDataBuilder;
 import de.caritas.cob.consultingtypeservice.tenantservice.generated.web.model.RestrictedTenantDTO;
 import de.caritas.cob.consultingtypeservice.tenantservice.generated.web.model.Settings;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import de.caritas.cob.consultingtypeservice.testHelper.TopicPathConstants;
+import java.io.IOException;
 import java.util.Map;
 import org.assertj.core.util.Maps;
 import org.assertj.core.util.Sets;
 import org.jeasy.random.EasyRandom;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
@@ -43,14 +47,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest(classes = ConsultingTypeServiceApplication.class)
+@SpringBootTest
+@ContextConfiguration(
+    classes = ConsultingTypeServiceApplication.class,
+    initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 @TestPropertySource(properties = "feature.multitenancy.with.single.domain.enabled=true")
 class TopicAdminControllerIT {
 
@@ -59,6 +67,16 @@ class TopicAdminControllerIT {
   @Autowired private WebApplicationContext context;
 
   @MockBean TenantService tenantService;
+
+  @BeforeAll
+  static void setUp() throws IOException {
+    MongoTestInitializer.setUp();
+  }
+
+  @AfterAll
+  static void tearDown() {
+    MongoTestInitializer.tearDown();
+  }
 
   @BeforeEach
   public void setup() {

@@ -16,9 +16,13 @@ import de.caritas.cob.consultingtypeservice.api.model.ApplicationSettingsPatchDT
 import de.caritas.cob.consultingtypeservice.api.repository.ApplicationSettingsRepository;
 import de.caritas.cob.consultingtypeservice.api.tenant.TenantContext;
 import de.caritas.cob.consultingtypeservice.api.util.JsonConverter;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import jakarta.servlet.http.Cookie;
+import java.io.IOException;
 import java.util.Map;
 import org.assertj.core.util.Maps;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.AccessToken;
@@ -26,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -33,6 +38,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(classes = ConsultingTypeServiceApplication.class)
+@ContextConfiguration(
+    classes = ConsultingTypeServiceApplication.class,
+    initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 @TestPropertySource(properties = "feature.multitenancy.with.single.domain.enabled=true")
 @AutoConfigureMockMvc(addFilters = false)
@@ -43,6 +51,16 @@ class ApplicationSettingsControllerIT {
   @Autowired private WebApplicationContext context;
 
   @Autowired private ApplicationSettingsRepository applicationSettingsRepository;
+
+  @BeforeAll
+  static void setUp() throws IOException {
+    MongoTestInitializer.setUp();
+  }
+
+  @AfterAll
+  static void tearDown() {
+    MongoTestInitializer.tearDown();
+  }
 
   @BeforeEach
   public void setup() {

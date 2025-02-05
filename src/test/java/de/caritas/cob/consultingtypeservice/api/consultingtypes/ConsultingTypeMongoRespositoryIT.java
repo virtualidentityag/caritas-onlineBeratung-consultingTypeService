@@ -8,12 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.api.model.ConsultingTypeEntity;
 import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
-import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.mongo.config.MongodConfig;
-import de.flapdoodle.embed.process.runtime.Network;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
@@ -22,18 +17,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 @DataMongoTest
-@ContextConfiguration(classes = ConsultingTypeServiceApplication.class, initializers = ConsultingTypeMongoRespositoryIT.Initializer.class)
+@ContextConfiguration(
+    classes = ConsultingTypeServiceApplication.class,
+    initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 @TestPropertySource(properties = "multitenancy.enabled=true")
 @TestPropertySource(
@@ -43,32 +35,18 @@ class ConsultingTypeMongoRespositoryIT {
 
   private final String MONGO_COLLECTION_NAME = "consulting_types";
 
-  private static MongodExecutable mongodExecutable;
-
-  private static int mongoPort;
-
-
   @Autowired private ConsultingTypeRepository consultingTypeRepository;
 
   @Autowired MongoTemplate mongoTemplate;
 
   @BeforeAll
   static void setUp() throws IOException {
-    MongodStarter starter = MongodStarter.getDefaultInstance();
-    mongoPort = 27017;
-    MongodConfig mongodConfig = MongodConfig.builder()
-        .version(Version.Main.V4_0)
-        .net(new Net(mongoPort, Network.localhostIsIPv6()))
-        .build();
-    mongodExecutable = starter.prepare(mongodConfig);
-    mongodExecutable.start();
+    MongoTestInitializer.setUp();
   }
 
   @AfterAll
   static void tearDown() {
-    if (mongodExecutable != null) {
-      mongodExecutable.stop();
-    }
+    MongoTestInitializer.tearDown();
   }
 
   @BeforeEach
@@ -123,15 +101,5 @@ class ConsultingTypeMongoRespositoryIT {
     List<ConsultingTypeEntity> result = consultingTypeRepository.findAll();
     // then
     assertThat(result).hasSize(3);
-  }
-
-  static class Initializer implements
-      ApplicationContextInitializer<ConfigurableApplicationContext> {
-    @Override
-    public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-      TestPropertyValues.of(
-          "spring.data.mongodb.uri=mongodb://localhost:" + mongoPort + "/test"
-      ).applyTo(configurableApplicationContext.getEnvironment());
-    }
   }
 }

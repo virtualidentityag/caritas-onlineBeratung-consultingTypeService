@@ -8,24 +8,47 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
+import de.caritas.cob.consultingtypeservice.api.controller.ActuatorControllerIT.TestConfig;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
+import java.io.IOException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest(classes = ConsultingTypeServiceApplication.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ContextConfiguration(
+    classes = {ConsultingTypeServiceApplication.class, TestConfig.class},
+    initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
-@AutoConfigureMockMvc(addFilters = false)
 class ActuatorControllerIT {
 
-  @Autowired private WebApplicationContext context;
+  @Autowired
+  private WebApplicationContext context;
 
   private MockMvc mockMvc;
+
+  @BeforeAll
+  static void setUp() throws IOException {
+    MongoTestInitializer.setUp();
+  }
+
+  @AfterAll
+  static void tearDown() {
+    MongoTestInitializer.tearDown();
+  }
 
   @BeforeEach
   public void setup() {
@@ -49,5 +72,11 @@ class ActuatorControllerIT {
     mockMvc
         .perform(get("/actuator/beans").contentType(APPLICATION_JSON))
         .andExpect(status().isNotFound());
+  }
+
+  @Configuration
+  static class TestConfig {
+    @MockBean
+    private JwtDecoder jwtDecoder;
   }
 }

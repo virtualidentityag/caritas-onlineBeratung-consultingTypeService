@@ -8,8 +8,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.api.model.ConsultingTypeEntity;
 import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import java.io.IOException;
 import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +22,16 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-@DataMongoTest()
-@ContextConfiguration(classes = ConsultingTypeServiceApplication.class)
+@DataMongoTest
+@ContextConfiguration(
+    classes = ConsultingTypeServiceApplication.class,
+    initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 @TestPropertySource(properties = "multitenancy.enabled=true")
 @TestPropertySource(
     properties =
         "consulting.types.json.path=src/test/resources/consulting-type-settings-tenant-specific")
-public class ConsultingTypeMongoTenantAwareRespositoryIT {
+class ConsultingTypeMongoTenantAwareRespositoryIT {
 
   private static final long FIRST_TENANT = 1L;
   private static final long SECOND_TENANT = 2L;
@@ -35,6 +40,16 @@ public class ConsultingTypeMongoTenantAwareRespositoryIT {
   @Autowired private ConsultingTypeTenantAwareRepository consultingTypeMongoTenantAwareRepository;
 
   @Autowired MongoTemplate mongoTemplate;
+
+  @BeforeAll
+  static void setUp() throws IOException {
+    MongoTestInitializer.setUp();
+  }
+
+  @AfterAll
+  static void tearDown() {
+    MongoTestInitializer.tearDown();
+  }
 
   @BeforeEach
   public void initializeMongoDbWithData() throws IOException {
@@ -55,7 +70,7 @@ public class ConsultingTypeMongoTenantAwareRespositoryIT {
   }
 
   @Test
-  public void findConsultingTypeByIdAndTenantId_Should_ReturnCorrectConsultingType() {
+  void findConsultingTypeByIdAndTenantId_Should_ReturnCorrectConsultingType() {
     // given
     Integer consultingTypeId = 10;
     String slug = "consultingtype10";
@@ -76,7 +91,7 @@ public class ConsultingTypeMongoTenantAwareRespositoryIT {
   }
 
   @Test
-  public void findConsultingTypeByTenantId_Should_ReturnCorrectConsultingType() {
+  void findConsultingTypeByTenantId_Should_ReturnCorrectConsultingType() {
     // given
     Integer consultingTypeId = 10;
     String slug = "consultingtype10";
@@ -96,7 +111,7 @@ public class ConsultingTypeMongoTenantAwareRespositoryIT {
   }
 
   @Test
-  public void findByConsultingTypeId_Should_ReturnCorrectConsultingType() {
+  void findByConsultingTypeId_Should_ReturnCorrectConsultingType() {
     // given
     Integer consultingTypeId = 10;
     String slug = "consultingtype10";
@@ -111,7 +126,7 @@ public class ConsultingTypeMongoTenantAwareRespositoryIT {
   }
 
   @Test
-  public void findBySlugAndTenantId_Should_ReturnCorrectConsultingType() {
+  void findBySlugAndTenantId_Should_ReturnCorrectConsultingType() {
     // given
     Integer consultingTypeId = 10;
     String slug = "consultingtype10";
@@ -130,7 +145,7 @@ public class ConsultingTypeMongoTenantAwareRespositoryIT {
   }
 
   @Test
-  public void findBySlug_Should_ReturnCorrectConsultingTyp() {
+  void findBySlug_Should_ReturnCorrectConsultingTyp() {
     // given
     Integer consultingTypeId = 10;
     String slug = "consultingtype10";
@@ -144,7 +159,7 @@ public class ConsultingTypeMongoTenantAwareRespositoryIT {
   }
 
   @Test
-  public void findAllHavingTenantId_Should_ReturnFilteredListOfConsultingTypes() {
+  void findAllHavingTenantId_Should_ReturnFilteredListOfConsultingTypes() {
     // given
     List<ConsultingTypeEntity> result1 =
         consultingTypeMongoTenantAwareRepository.findAllHavingTenantId(FIRST_TENANT);
@@ -159,7 +174,7 @@ public class ConsultingTypeMongoTenantAwareRespositoryIT {
   }
 
   @Test
-  public void findAll_Should_ReturnAllConsultingTypes() {
+  void findAll_Should_ReturnAllConsultingTypes() {
     // when
     List<ConsultingTypeEntity> result = consultingTypeMongoTenantAwareRepository.findAll();
     // then
