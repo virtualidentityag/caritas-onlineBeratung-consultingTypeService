@@ -185,8 +185,9 @@ class TopicAdminControllerIT {
   }
 
   @Test
-  void createTopic_Should_returnUnauthorized_When_calledWithValidCreateParamsButAsUnauthenticatedUser()
-      throws Exception {
+  void
+      createTopic_Should_returnUnauthorized_When_calledWithValidCreateParamsButAsUnauthenticatedUser()
+          throws Exception {
     final EasyRandom easyRandom = new EasyRandom();
     final TopicMultilingualDTO topicDTO = easyRandom.nextObject(TopicMultilingualDTO.class);
     final String payload = JsonConverter.convertToJson(topicDTO);
