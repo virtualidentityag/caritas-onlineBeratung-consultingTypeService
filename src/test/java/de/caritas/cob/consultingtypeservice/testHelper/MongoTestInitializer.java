@@ -16,12 +16,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class MongoTestInitializer
     implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
+  private static final int MONGO_PORT = 27017;
   public static MongodExecutable mongodExecutable;
-  private static final int mongoPort = 27017;
 
   @Override
   public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-    TestPropertyValues.of("spring.data.mongodb.uri=mongodb://localhost:" + mongoPort + "/test")
+    TestPropertyValues.of("spring.data.mongodb.uri=mongodb://localhost:" + MONGO_PORT + "/test")
         .applyTo(configurableApplicationContext.getEnvironment());
     try {
       setUp();
@@ -38,7 +38,7 @@ public class MongoTestInitializer
     MongodConfig mongodConfig =
         MongodConfig.builder()
             .version(Version.Main.V4_0)
-            .net(new Net(mongoPort, Network.localhostIsIPv6()))
+            .net(new Net(MONGO_PORT, Network.localhostIsIPv6()))
             .build();
     synchronized (this) {
       mongodExecutable = starter.prepare(mongodConfig);

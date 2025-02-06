@@ -2,7 +2,6 @@ package de.caritas.cob.consultingtypeservice.api.controller;
 
 import static de.caritas.cob.consultingtypeservice.api.auth.UserRole.TENANT_ADMIN;
 import static de.caritas.cob.consultingtypeservice.api.auth.UserRole.TOPIC_ADMIN;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -18,11 +17,8 @@ import de.caritas.cob.consultingtypeservice.api.tenant.TenantContext;
 import de.caritas.cob.consultingtypeservice.api.util.JsonConverter;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import jakarta.servlet.http.Cookie;
-import java.util.Map;
-import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -192,11 +188,5 @@ class ApplicationSettingsControllerIT {
     entity.setReleaseToggles("featureToggleTenantCreationEnabled", true);
     applicationSettingsRepository.deleteAll();
     applicationSettingsRepository.save(entity);
-  }
-
-  private void givenOtherClaimsAreDefinedForToken(final AccessToken token) {
-    final Map<String, Object> claimMap = Maps.newHashMap("username", "test");
-    claimMap.put("userId", "some userid");
-    when(token.getOtherClaims()).thenReturn(claimMap);
   }
 }

@@ -52,7 +52,6 @@ class ConsultingTypeGroupRespositoryTenantAwareIT {
     final String GROUP_2 = "group2";
     final String GROUP_3 = "group3";
     final int CONSULTING_TYPE_ID_1 = 11;
-    final int CONSULTING_TYPE_ID_2 = 12;
     assertThat(result.get(GROUP_2)).hasSize(1);
     assertThat(result.get(GROUP_3)).hasSize(1);
     assertThat(result).containsKey(GROUP_2);

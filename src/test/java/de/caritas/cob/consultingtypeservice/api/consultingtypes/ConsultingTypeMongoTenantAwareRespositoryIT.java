@@ -12,8 +12,6 @@ import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -44,18 +42,6 @@ class ConsultingTypeMongoTenantAwareRespositoryIT {
   @Autowired private ConsultingTypeTenantAwareRepository consultingTypeMongoTenantAwareRepository;
 
   @Autowired MongoTemplate mongoTemplate;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    log.info("Setting up MongoDb");
-    //   MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    log.info("Tearing down MongoDb");
-    // MongoTestInitializer.tearDown();
-  }
 
   @BeforeEach
   public void initializeMongoDbWithData() throws IOException {

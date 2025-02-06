@@ -31,7 +31,7 @@ import org.springframework.test.context.TestPropertySource;
         "consulting.types.json.path=src/test/resources/consulting-type-settings-tenant-specific")
 class ConsultingTypeMongoRespositoryIT {
 
-  private final String MONGO_COLLECTION_NAME = "consulting_types";
+  private static final String MONGO_COLLECTION_NAME = "consulting_types";
 
   @Autowired private ConsultingTypeRepository consultingTypeRepository;
 
