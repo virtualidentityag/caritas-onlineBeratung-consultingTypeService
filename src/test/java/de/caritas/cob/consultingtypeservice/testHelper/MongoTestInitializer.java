@@ -32,7 +32,8 @@ public class MongoTestInitializer
 
   public void setUp() throws IOException {
     if (mongodExecutable != null) {
-      return;
+      // stop mongod if it is already running, to guarantee fresh instance for each test
+      tearDown();
     }
     MongodStarter starter = MongodStarter.getDefaultInstance();
     MongodConfig mongodConfig =
