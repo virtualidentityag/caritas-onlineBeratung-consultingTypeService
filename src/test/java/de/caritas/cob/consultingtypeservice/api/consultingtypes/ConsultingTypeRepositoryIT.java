@@ -5,10 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
-import java.io.IOException;
 import java.util.List;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,16 +23,6 @@ class ConsultingTypeRepositoryIT {
 
   @Autowired private ConsultingTypeLoader consultingTypeLoader;
   @Autowired private ConsultingTypeRepositoryService consultingTypeRepositoryService;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @Test
   void getConsultingTypeById_Should_ReturnCorrectConsultingType() {

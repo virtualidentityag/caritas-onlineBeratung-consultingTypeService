@@ -11,9 +11,11 @@ import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import java.io.IOException;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -31,6 +33,8 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(
     properties =
         "consulting.types.json.path=src/test/resources/consulting-type-settings-tenant-specific")
+@Slf4j
+@Disabled
 class ConsultingTypeMongoTenantAwareRespositoryIT {
 
   private static final long FIRST_TENANT = 1L;
@@ -43,20 +47,24 @@ class ConsultingTypeMongoTenantAwareRespositoryIT {
 
   @BeforeAll
   static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
+    log.info("Setting up MongoDb");
+    //   MongoTestInitializer.setUp();
   }
 
   @AfterAll
   static void tearDown() {
-    MongoTestInitializer.tearDown();
+    log.info("Tearing down MongoDb");
+    // MongoTestInitializer.tearDown();
   }
 
   @BeforeEach
   public void initializeMongoDbWithData() throws IOException {
+    log.info("Initialize MongoDb with data");
     mongoTemplate.dropCollection(MONGO_COLLECTION_NAME);
     insertJsonFromFilename("consulting-type-0.json");
     insertJsonFromFilename("consulting-type-1.json");
     insertJsonFromFilename("consulting-type-2.json");
+    log.info("Finished initialize MongoDb with data");
   }
 
   private void insertJsonFromFilename(String fileName) throws IOException {

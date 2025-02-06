@@ -11,10 +11,7 @@ import de.caritas.cob.consultingtypeservice.api.consultingtypes.ConsultingTypeRe
 import de.caritas.cob.consultingtypeservice.api.model.ExtendedConsultingTypeResponseDTO;
 import de.caritas.cob.consultingtypeservice.api.model.PaginationLinks;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
-import java.io.IOException;
 import java.util.List;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,16 +27,6 @@ class ConsultingTypeAdminServiceIT {
 
   @Autowired private ConsultingTypeAdminService consultingTypeAdminService;
   @Autowired private ConsultingTypeRepositoryService consultingTypeRepositoryService;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @Test
   void findConsultingTypes_Should_returnOneResult_When_perPageIsSetToOneAndPageIsSetToOne() {

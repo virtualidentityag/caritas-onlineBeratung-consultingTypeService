@@ -17,9 +17,6 @@ import de.caritas.cob.consultingtypeservice.tenantservice.generated.web.model.Re
 import de.caritas.cob.consultingtypeservice.tenantservice.generated.web.model.Settings;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import de.caritas.cob.consultingtypeservice.testHelper.TopicPathConstants;
-import java.io.IOException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -49,16 +46,6 @@ class TopicControllerIT {
   @Autowired private WebApplicationContext context;
 
   @MockBean TenantService tenantService;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @BeforeEach
   public void setup() {

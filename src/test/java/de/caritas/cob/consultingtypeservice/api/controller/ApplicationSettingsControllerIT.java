@@ -18,11 +18,8 @@ import de.caritas.cob.consultingtypeservice.api.tenant.TenantContext;
 import de.caritas.cob.consultingtypeservice.api.util.JsonConverter;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import jakarta.servlet.http.Cookie;
-import java.io.IOException;
 import java.util.Map;
 import org.assertj.core.util.Maps;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.AccessToken;
@@ -51,16 +48,6 @@ class ApplicationSettingsControllerIT {
   @Autowired private WebApplicationContext context;
 
   @Autowired private ApplicationSettingsRepository applicationSettingsRepository;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @BeforeEach
   public void setup() {

@@ -29,12 +29,9 @@ import de.caritas.cob.consultingtypeservice.api.model.FullConsultingTypeResponse
 import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import jakarta.servlet.http.Cookie;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import org.jeasy.random.EasyRandom;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.Keycloak;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,16 +73,6 @@ class ConsultingTypeControllerE2EIT {
   @MockBean private Keycloak keycloak;
 
   @MockBean AuthenticatedUser authenticatedUser;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @Test
   void createConsultingType_Should_returnOk_When_requiredConsultingTypeDTOIsGiven()

@@ -10,9 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.api.controller.ActuatorControllerIT.TestConfig;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
-import java.io.IOException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +35,6 @@ class ActuatorControllerIT {
   @Autowired private WebApplicationContext context;
 
   private MockMvc mockMvc;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @BeforeEach
   public void setup() {

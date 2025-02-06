@@ -32,14 +32,11 @@ import de.caritas.cob.consultingtypeservice.api.service.ConsultingTypeService;
 import de.caritas.cob.consultingtypeservice.api.tenant.TenantResolver;
 import de.caritas.cob.consultingtypeservice.testHelper.HelperMethods;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.jeasy.random.EasyRandom;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,16 +71,6 @@ class ConsultingTypeControllerIT {
   @MockBean private ConsultingTypeGroupService consultingTypeGroupService;
   @MockBean private LinkDiscoverers linkDiscoverers;
   @MockBean private TenantResolver tenantResolver;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @BeforeEach
   public void setup() {

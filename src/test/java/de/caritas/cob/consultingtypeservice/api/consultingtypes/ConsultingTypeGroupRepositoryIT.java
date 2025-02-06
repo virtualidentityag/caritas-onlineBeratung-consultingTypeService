@@ -10,12 +10,9 @@ import static org.hamcrest.beans.HasPropertyWithValue.hasProperty;
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.hamcrest.collection.IsMapContaining;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,16 +29,6 @@ class ConsultingTypeGroupRepositoryIT {
   @Autowired private ConsultingTypeLoader consultingTypeLoader;
 
   @Autowired private ConsultingTypeGroupRepository consultingTypeGroupRepository;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @Test
   void getConsultingTypesGroupMap_Should_ReturnMapWithConsultingTypeGroups() {

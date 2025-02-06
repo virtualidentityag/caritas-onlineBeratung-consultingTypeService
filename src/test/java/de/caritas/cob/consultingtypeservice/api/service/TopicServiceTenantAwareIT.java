@@ -6,10 +6,7 @@ import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.api.model.TopicEntity;
 import de.caritas.cob.consultingtypeservice.api.tenant.TenantContext;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
-import java.io.IOException;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +26,6 @@ import org.springframework.test.context.TestPropertySource;
 class TopicServiceTenantAwareIT {
 
   @Autowired TopicService topicService;
-
-  @BeforeAll
-  static void setUp() throws IOException {
-    MongoTestInitializer.setUp();
-  }
-
-  @AfterAll
-  static void tearDown() {
-    MongoTestInitializer.tearDown();
-  }
 
   @BeforeEach
   void setup() {
