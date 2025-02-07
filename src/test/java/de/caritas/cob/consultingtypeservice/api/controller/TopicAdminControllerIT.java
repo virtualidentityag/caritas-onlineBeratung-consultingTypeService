@@ -4,8 +4,6 @@ import static de.caritas.cob.consultingtypeservice.api.auth.UserRole.TOPIC_ADMIN
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,7 +12,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.google.common.collect.Lists;
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
+import de.caritas.cob.consultingtypeservice.api.auth.RoleAuthorizationAuthorityMapper;
 import de.caritas.cob.consultingtypeservice.api.auth.UserRole;
 import de.caritas.cob.consultingtypeservice.api.model.TopicMultilingualDTO;
 import de.caritas.cob.consultingtypeservice.api.model.TopicStatus;
@@ -26,17 +26,13 @@ import de.caritas.cob.consultingtypeservice.tenantservice.generated.web.model.Re
 import de.caritas.cob.consultingtypeservice.tenantservice.generated.web.model.Settings;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import de.caritas.cob.consultingtypeservice.testHelper.TopicPathConstants;
+import java.time.Instant;
 import java.util.Map;
-import org.assertj.core.util.Maps;
+import java.util.Set;
 import org.assertj.core.util.Sets;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
-import org.keycloak.adapters.spi.KeycloakAccount;
-import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.AccessToken;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,6 +40,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -305,22 +303,33 @@ class TopicAdminControllerIT {
   }
 
   private Authentication givenMockAuthentication(final UserRole userRole) {
-    final var securityContext = mock(RefreshableKeycloakSecurityContext.class);
-    when(securityContext.getTokenString()).thenReturn("tokenString");
-    final var token = mock(AccessToken.class, Mockito.RETURNS_DEEP_STUBS);
-    when(securityContext.getToken()).thenReturn(token);
-    givenOtherClaimsAreDefinedForToken(token);
-    final KeycloakAccount mockAccount =
-        new SimpleKeycloakAccount(() -> "user", Sets.newHashSet(), securityContext);
+    Map<String, Object> claims =
+        Map.of(
+            "sub",
+            "user",
+            "roles",
+            Set.of(userRole.getValue()),
+            "iss",
+            "https://issuer.example.com",
+            "exp",
+            Instant.now().plusSeconds(3600).getEpochSecond(),
+            "userId",
+            "mockedUserId");
 
-    Authentication authentication =
-        new AuthenticationMockBuilder().withUserRole(userRole.getValue()).build();
-    return new KeycloakAuthenticationToken(mockAccount, true, authentication.getAuthorities());
-  }
+    Jwt jwt =
+        new Jwt(
+            "mockedTokenValue",
+            Instant.now(),
+            Instant.now().plusSeconds(3600),
+            Map.of("alg", "HS256"),
+            claims);
 
-  private void givenOtherClaimsAreDefinedForToken(final AccessToken token) {
-    final Map<String, Object> claimMap = Maps.newHashMap("username", "test");
-    claimMap.put("userId", "some userid");
-    when(token.getOtherClaims()).thenReturn(claimMap);
+    RoleAuthorizationAuthorityMapper roleAuthorizationAuthorityMapper =
+        new RoleAuthorizationAuthorityMapper();
+    Set<String> roleNames = Sets.newHashSet();
+    roleNames.add(userRole.getValue());
+    var authorities = roleAuthorizationAuthorityMapper.mapAuthorities(roleNames);
+
+    return new JwtAuthenticationToken(jwt, Lists.newArrayList(authorities));
   }
 }
