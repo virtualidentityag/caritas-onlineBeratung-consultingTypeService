@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import de.caritas.cob.consultingtypeservice.api.auth.RoleAuthorizationAuthorityMapper;
-import de.caritas.cob.consultingtypeservice.api.consultingtypes.ConsultingTypeConverter;
 import de.caritas.cob.consultingtypeservice.api.exception.UnexpectedErrorException;
 import de.caritas.cob.consultingtypeservice.api.exception.httpresponses.NotFoundException;
 import de.caritas.cob.consultingtypeservice.api.mapper.BasicConsultingTypeMapper;
@@ -32,6 +31,7 @@ import de.caritas.cob.consultingtypeservice.api.service.ConsultingTypeGroupServi
 import de.caritas.cob.consultingtypeservice.api.service.ConsultingTypeService;
 import de.caritas.cob.consultingtypeservice.api.tenant.TenantResolver;
 import de.caritas.cob.consultingtypeservice.testHelper.HelperMethods;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import java.util.Arrays;
 import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
@@ -46,6 +46,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.client.LinkDiscoverers;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -53,6 +54,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ContextConfiguration(initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 class ConsultingTypeControllerIT {
 
@@ -74,8 +76,6 @@ class ConsultingTypeControllerIT {
   public void setup() {
     mvc = MockMvcBuilders.webAppContextSetup(context).build();
   }
-
-  private final ConsultingTypeConverter consultingTypeConverter = new ConsultingTypeConverter();
 
   @Test
   void getBasicConsultingTypeList_Should_ReturnNoContent_When_ServiceReturnsEmptyList()
@@ -114,7 +114,7 @@ class ConsultingTypeControllerIT {
         .thenReturn(FullConsultingTypeMapper.mapConsultingType(HelperMethods.getConsultingType()));
 
     mvc.perform(
-            get(String.format(PATH_GET_FULL_CONSULTING_TYPE_BY_ID, consultingTypeId))
+            get(PATH_GET_FULL_CONSULTING_TYPE_BY_ID.formatted(consultingTypeId))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(
@@ -132,7 +132,7 @@ class ConsultingTypeControllerIT {
         .thenThrow(new NotFoundException("Not found"));
 
     mvc.perform(
-            get(String.format(PATH_GET_FULL_CONSULTING_TYPE_BY_ID, consultingTypeId))
+            get(PATH_GET_FULL_CONSULTING_TYPE_BY_ID.formatted(consultingTypeId))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound())
         .andExpect(json().isStringEqualTo(StringUtils.EMPTY));
@@ -146,7 +146,7 @@ class ConsultingTypeControllerIT {
         .thenReturn(FullConsultingTypeMapper.mapConsultingType(HelperMethods.getConsultingType()));
 
     mvc.perform(
-            get(String.format(PATH_GET_FULL_CONSULTING_TYPE_BY_SLUG, consultingTypeSlug))
+            get(PATH_GET_FULL_CONSULTING_TYPE_BY_SLUG.formatted(consultingTypeSlug))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(
@@ -164,7 +164,7 @@ class ConsultingTypeControllerIT {
         .thenThrow(new NotFoundException("Not found"));
 
     mvc.perform(
-            get(String.format(PATH_GET_FULL_CONSULTING_TYPE_BY_SLUG, consultingTypeSlug))
+            get(PATH_GET_FULL_CONSULTING_TYPE_BY_SLUG.formatted(consultingTypeSlug))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound())
         .andExpect(json().isStringEqualTo(StringUtils.EMPTY));
@@ -180,7 +180,7 @@ class ConsultingTypeControllerIT {
         .thenReturn(extendedConsultingTypeResponseDTO);
 
     mvc.perform(
-            get(String.format(PATH_GET_EXTENDED_CONSULTING_TYPE_BY_ID, consultingTypeId))
+            get(PATH_GET_EXTENDED_CONSULTING_TYPE_BY_ID.formatted(consultingTypeId))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(
@@ -198,7 +198,7 @@ class ConsultingTypeControllerIT {
         .thenThrow(new NotFoundException("Not found"));
 
     mvc.perform(
-            get(String.format(PATH_GET_EXTENDED_CONSULTING_TYPE_BY_ID, consultingTypeId))
+            get(PATH_GET_EXTENDED_CONSULTING_TYPE_BY_ID.formatted(consultingTypeId))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound())
         .andExpect(json().isStringEqualTo(StringUtils.EMPTY));
@@ -214,7 +214,7 @@ class ConsultingTypeControllerIT {
         .thenReturn(basicConsultingTypeResponseDTO);
 
     mvc.perform(
-            get(String.format(PATH_GET_BASIC_CONSULTING_TYPE_BY_ID, consultingTypeId))
+            get(PATH_GET_BASIC_CONSULTING_TYPE_BY_ID.formatted(consultingTypeId))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(
@@ -231,7 +231,7 @@ class ConsultingTypeControllerIT {
         .thenThrow(new NotFoundException("Not found"));
 
     mvc.perform(
-            get(String.format(PATH_GET_BASIC_CONSULTING_TYPE_BY_ID, consultingTypeId))
+            get(PATH_GET_BASIC_CONSULTING_TYPE_BY_ID.formatted(consultingTypeId))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound())
         .andExpect(json().isStringEqualTo(StringUtils.EMPTY));

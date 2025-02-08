@@ -5,7 +5,7 @@ import de.caritas.cob.consultingtypeservice.api.model.ApplicationSettingsPatchDT
 import de.caritas.cob.consultingtypeservice.api.service.ApplicationSettingsServiceFacade;
 import de.caritas.cob.consultingtypeservice.generated.api.controller.SettingsApi;
 import de.caritas.cob.consultingtypeservice.generated.api.controller.SettingsadminApi;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 /** Controller for consulting type API requests. */
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "applicationsettings-controller")
 @Slf4j
+@Tag(name = "applicationsettings-controller")
 public class ApplicationSettingsController implements SettingsApi, SettingsadminApi {
 
   private final @NonNull ApplicationSettingsServiceFacade applicationSettingsServiceFacade;

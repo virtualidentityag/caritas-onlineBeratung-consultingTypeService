@@ -27,9 +27,10 @@ import de.caritas.cob.consultingtypeservice.api.model.ConsultingTypeEntity;
 import de.caritas.cob.consultingtypeservice.api.model.ConsultingTypePatchDTO;
 import de.caritas.cob.consultingtypeservice.api.model.FullConsultingTypeResponseDTO;
 import de.caritas.cob.consultingtypeservice.schemas.model.ConsultingType;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
+import jakarta.servlet.http.Cookie;
 import java.util.Arrays;
 import java.util.HashSet;
-import javax.servlet.http.Cookie;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.Keycloak;
@@ -42,11 +43,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@SpringBootTest(classes = ConsultingTypeServiceApplication.class)
+@SpringBootTest
+@ContextConfiguration(
+    classes = ConsultingTypeServiceApplication.class,
+    initializers = MongoTestInitializer.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("testing")
 @AutoConfigureTestDatabase
@@ -118,23 +122,22 @@ class ConsultingTypeControllerE2EIT {
         new AuthenticationMockBuilder().withUserRole(TENANT_ADMIN.getValue()).build();
 
     // when
-    MvcResult mvcResult =
-        this.mvc
-            .perform(
-                patch(ROOT_PATH + "/" + EXISTING_ID)
-                    .with(authentication(authentication))
-                    .cookie(CSRF_COOKIE)
-                    .header(CSRF_HEADER, CSRF_VALUE)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(consultingTypeDTO)))
-            // then
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("id").value(EXISTING_ID))
-            .andExpect(jsonPath("isVideoCallAllowed").value(true))
-            .andExpect(jsonPath("languageFormal").value(true))
-            .andExpect(jsonPath("welcomeMessage.sendWelcomeMessage").value(true))
-            .andExpect(jsonPath("welcomeMessage.welcomeMessageText").value("welcome"))
-            .andReturn();
+    this.mvc
+        .perform(
+            patch(ROOT_PATH + "/" + EXISTING_ID)
+                .with(authentication(authentication))
+                .cookie(CSRF_COOKIE)
+                .header(CSRF_HEADER, CSRF_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(consultingTypeDTO)))
+        // then
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("id").value(EXISTING_ID))
+        .andExpect(jsonPath("isVideoCallAllowed").value(true))
+        .andExpect(jsonPath("languageFormal").value(true))
+        .andExpect(jsonPath("welcomeMessage.sendWelcomeMessage").value(true))
+        .andExpect(jsonPath("welcomeMessage.welcomeMessageText").value("welcome"))
+        .andReturn();
   }
 
   @Test
@@ -208,17 +211,16 @@ class ConsultingTypeControllerE2EIT {
     objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
     // when
-    MvcResult mvcResult =
-        this.mvc
-            .perform(
-                patch(ROOT_PATH + "/" + EXISTING_ID)
-                    .cookie(CSRF_COOKIE)
-                    .header(CSRF_HEADER, CSRF_VALUE)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(consultingTypeDTO)))
-            // then
-            .andExpect(status().isForbidden())
-            .andReturn();
+    this.mvc
+        .perform(
+            patch(ROOT_PATH + "/" + EXISTING_ID)
+                .cookie(CSRF_COOKIE)
+                .header(CSRF_HEADER, CSRF_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(consultingTypeDTO)))
+        // then
+        .andExpect(status().isForbidden())
+        .andReturn();
   }
 
   @Test
@@ -258,7 +260,7 @@ class ConsultingTypeControllerE2EIT {
     // when
 
     mvc.perform(
-            MockMvcRequestBuilders.get(String.format(PATH_GET_FULL_CONSULTING_TYPE_BY_TENANT, 1))
+            MockMvcRequestBuilders.get(PATH_GET_FULL_CONSULTING_TYPE_BY_TENANT.formatted(1))
                 .with(authentication(authentication))
                 .accept(MediaType.APPLICATION_JSON)
                 .cookie(CSRF_COOKIE)

@@ -9,7 +9,7 @@ import de.caritas.cob.consultingtypeservice.api.model.FullConsultingTypeResponse
 import de.caritas.cob.consultingtypeservice.api.service.ConsultingTypeGroupService;
 import de.caritas.cob.consultingtypeservice.api.service.ConsultingTypeService;
 import de.caritas.cob.consultingtypeservice.generated.api.controller.ConsultingtypesApi;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for consulting type API requests. */
 @RestController
+@Tag(name = "consulting-type-controller")
 @RequiredArgsConstructor
-@Api(tags = "consulting-type-controller")
 public class ConsultingTypeController implements ConsultingtypesApi {
 
   private final @NonNull ConsultingTypeService consultingTypeService;

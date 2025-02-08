@@ -4,7 +4,7 @@ import de.caritas.cob.consultingtypeservice.api.auth.AuthenticatedUser;
 import de.caritas.cob.consultingtypeservice.api.model.TopicDTO;
 import de.caritas.cob.consultingtypeservice.api.service.TopicServiceFacade;
 import de.caritas.cob.consultingtypeservice.generated.api.controller.TopicApi;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for consulting type API requests. */
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "topic-controller")
 @Slf4j
+@Tag(name = "topic-controller")
 public class TopicController implements TopicApi {
 
   private final @NonNull TopicServiceFacade topicServiceFacade;

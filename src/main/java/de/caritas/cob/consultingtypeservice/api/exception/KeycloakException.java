@@ -1,8 +1,10 @@
 package de.caritas.cob.consultingtypeservice.api.exception;
 
+import java.io.Serial;
+
 public class KeycloakException extends RuntimeException {
 
-  private static final long serialVersionUID = -5083156826149548581L;
+  @Serial private static final long serialVersionUID = -5083156826149548581L;
 
   /**
    * Keycloak 409 Conflict exception
