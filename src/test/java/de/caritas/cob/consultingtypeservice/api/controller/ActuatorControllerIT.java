@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
 import de.caritas.cob.consultingtypeservice.api.controller.ActuatorControllerIT.TestConfig;
 import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
+import de.caritas.cob.consultingtypeservice.testHelper.TestMongoConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -30,6 +32,7 @@ import org.springframework.web.context.WebApplicationContext;
     classes = {ConsultingTypeServiceApplication.class, TestConfig.class},
     initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
+@Import(TestMongoConfig.class)
 class ActuatorControllerIT {
 
   @Autowired private WebApplicationContext context;
