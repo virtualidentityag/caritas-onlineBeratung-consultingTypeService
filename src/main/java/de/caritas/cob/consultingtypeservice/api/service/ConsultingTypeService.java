@@ -128,8 +128,8 @@ public class ConsultingTypeService {
           createdConsultingType.get(), FullConsultingTypeMapper::mapConsultingType);
     } else {
       throw new InternalServerErrorException(
-          String.format(
-              "Could not create a new consulting type with slug %s", consultingTypeDTO.getSlug()));
+          "Could not create a new consulting type with slug %s"
+              .formatted(consultingTypeDTO.getSlug()));
     }
   }
 

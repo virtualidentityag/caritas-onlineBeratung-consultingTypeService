@@ -16,14 +16,14 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.14</version>
+    <version>3.0.13</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <properties>
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <!-- force at least version 2.16 due to https://logging.apache.org/log4j/2.x/security.html -->
 
     <log4j.version>2.16.0</log4j.version>
@@ -49,11 +49,20 @@
     <liquibase-core.version>4.9.1</liquibase-core.version>
     <hibernate-validator.version>6.1.6.Final</hibernate-validator.version>
     <spring-security-test.version>5.5.7</spring-security-test.version>
-    <spring-boot-starter-data-mongodb.version>2.7.5</spring-boot-starter-data-mongodb.version>
-    <spring-boot-starter.version>2.6.15</spring-boot-starter.version>
+    <spring-boot-starter-data-mongodb.version>2.7.18</spring-boot-starter-data-mongodb.version>
+    <spring-boot-starter.version>2.7.18</spring-boot-starter.version>
     <spring-data-mongodb.version>3.3.5</spring-data-mongodb.version>
     <ehcache.version>2.10.9.2</ehcache.version>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache</artifactId>
+        <version>2.10.9.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- Spring Boot dependencies -->
@@ -64,7 +73,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-mongodb</artifactId>
-      <version>${spring-boot-starter-data-mongodb.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -89,7 +97,6 @@
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache</artifactId>
-      <version>${ehcache.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.fasterxml.jackson.core</groupId>
@@ -100,7 +107,12 @@
     <dependency>
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>${hibernate-validator.version}</version>
+      <version>8.0.1.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <version>5.0.0</version>
     </dependency>
     <!-- Spring actuator  -->
     <dependency>
@@ -122,21 +134,15 @@
     <!-- SpringFox: generate YAML file from POJOs and generate documentation -->
 
     <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-annotations</artifactId>
-      <version>2.2.15</version>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
     </dependency>
     <!-- SpringFox: generate YAML file from POJOs and generate documentation -->
 
     <dependency>
       <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-ui</artifactId>
-      <version>1.8.0</version>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>2.1.0</version>
     </dependency>
 
     <!-- Lombok dependencies -->
@@ -150,7 +156,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>${commons-lang3.version}</version>
     </dependency>
 
     <dependency>
@@ -163,6 +168,11 @@
       <groupId>com.github.jknack</groupId>
       <artifactId>handlebars</artifactId>
       <version>4.3.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
     </dependency>
 
     <!-- Keycloak dependencies -->
@@ -192,14 +202,25 @@
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-mongodb</artifactId>
-      <version>${spring-data-mongodb.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-sync</artifactId>
+      <version>4.8.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>bson</artifactId>
     </dependency>
 
     <!-- Test scope dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <version>${spring-boot-starter.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -211,13 +232,12 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-test</artifactId>
-      <version>${spring-security-test.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>de.flapdoodle.embed</groupId>
       <artifactId>de.flapdoodle.embed.mongo</artifactId>
-      <version>4.13.0</version>
+      <version>3.4.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -283,21 +303,18 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>${javax.ws.rs-api.version}</version>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
 
 
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-to-slf4j</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <!-- Liquibase -->
     <dependency>
@@ -308,7 +325,6 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>${liquibase-core.version}</version>
     </dependency>
     <dependency>
       <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
@@ -331,11 +347,6 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -415,6 +426,7 @@
               <configOptions>
                 <interfaceOnly>true</interfaceOnly>
                 <sourceFolder>/</sourceFolder>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/api/consultingtypeservice.yml</inputSpec>
               <generatorName>spring</generatorName>
@@ -439,6 +451,7 @@
               <configOptions>
                 <interfaceOnly>true</interfaceOnly>
                 <sourceFolder>/</sourceFolder>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/api/consultingtypeadminservice.yml</inputSpec>
               <generatorName>spring</generatorName>
@@ -463,6 +476,7 @@
               <configOptions>
                 <interfaceOnly>true</interfaceOnly>
                 <sourceFolder>/</sourceFolder>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/api/topicservice.yml</inputSpec>
               <generatorName>spring</generatorName>
@@ -482,6 +496,7 @@
               <configOptions>
                 <interfaceOnly>true</interfaceOnly>
                 <sourceFolder>/</sourceFolder>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/api/applicationsettingsservice.yml</inputSpec>
               <generatorName>spring</generatorName>
@@ -522,6 +537,7 @@
                 <sourceFolder>/</sourceFolder>
                 <library>resttemplate</library>
                 <dateLibrary>java8</dateLibrary>
+                <useSpringBoot3>true</useSpringBoot3>
               </configOptions>
               <inputSpec>${project.basedir}/services/tenantservice.yaml</inputSpec>
               <generatorName>java</generatorName>
@@ -545,14 +561,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.6.0</version>
         <executions>
           <execution>
             <id>validate</id>
             <phase>validate</phase>
             <configuration>
               <configLocation>google_checks_light.xml</configLocation>
-              <encoding>UTF-8</encoding>
               <failsOnError>false</failsOnError>
               <consoleOutput>true</consoleOutput>
               <failOnViolation>false</failOnViolation>
@@ -627,17 +642,17 @@
       <plugin>
         <groupId>org.openrewrite.maven</groupId>
         <artifactId>rewrite-maven-plugin</artifactId>
-        <version>5.30.0</version>
+        <version>5.47.0</version>
         <configuration>
           <activeRecipes>
-            <recipe>org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_6</recipe>
+            <recipe>org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0</recipe>
           </activeRecipes>
         </configuration>
         <dependencies>
           <dependency>
             <groupId>org.openrewrite.recipe</groupId>
             <artifactId>rewrite-spring</artifactId>
-            <version>5.9.0</version>
+            <version>5.25.0</version>
           </dependency>
         </dependencies>
       </plugin>

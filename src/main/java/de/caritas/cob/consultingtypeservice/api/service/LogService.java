@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 /** Service for logging. */
 public class LogService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LogService.class);
   private static final String MESSAGE_CONSULTING_TYPE_SERVICE_API = "ConsultingTypeService API: ";
+  private static final Logger LOGGER = LoggerFactory.getLogger(LogService.class);
   private static final String MESSAGE_SERVER_ERROR = "500 Internal Server Error: ";
 
   private LogService() {}
@@ -94,7 +94,7 @@ public class LogService {
     textStringBuilder.appendNewLine();
     textStringBuilder.appendln(message);
     textStringBuilder.appendln(
-        String.format("%s in file %s", validationException.getMessage(), filename));
+        "%s in file %s".formatted(validationException.getMessage(), filename));
     validationException.getCausingExceptions().stream()
         .map(ValidationException::getMessage)
         .forEach(textStringBuilder::appendln);

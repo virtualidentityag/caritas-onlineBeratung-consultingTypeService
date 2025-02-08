@@ -33,6 +33,13 @@ public enum Authority {
   private final UserRole userRole;
   private final List<String> grantedAuthorities;
 
+  public static Authority fromRoleName(String roleName) {
+    return Stream.of(values())
+        .filter(authority -> authority.userRole.getValue().equals(roleName))
+        .findFirst()
+        .orElse(null);
+  }
+
   public static List<String> getAuthoritiesByUserRole(UserRole userRole) {
     Optional<Authority> authorityByUserRole =
         Stream.of(values()).filter(authority -> authority.userRole.equals(userRole)).findFirst();

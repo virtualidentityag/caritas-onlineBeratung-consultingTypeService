@@ -7,12 +7,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 @ExtendWith(MockitoExtension.class)
-public class StatelessCsrfFilterTest {
+class StatelessCsrfFilterTest {
 
   private static final String CSRF_HEADER = "csrfHeader";
   private static final String CSRF_COOKIE = "csrfCookie";
@@ -38,12 +38,12 @@ public class StatelessCsrfFilterTest {
   @Mock private AccessDeniedHandler accessDeniedHandler;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     setField(csrfFilter, "accessDeniedHandler", accessDeniedHandler);
   }
 
   @Test
-  public void doFilterInternal_Should_executeFilterChain_When_requestMethodIsAllowed()
+  void doFilterInternal_Should_executeFilterChain_When_requestMethodIsAllowed()
       throws IOException, ServletException {
     when(request.getRequestURI()).thenReturn("uri");
     when(request.getMethod()).thenReturn("OPTIONS");
@@ -54,7 +54,7 @@ public class StatelessCsrfFilterTest {
   }
 
   @Test
-  public void doFilterInternal_Should_executeFilterChain_When_requestCsrfHeaderAndCookieAreEqual()
+  void doFilterInternal_Should_executeFilterChain_When_requestCsrfHeaderAndCookieAreEqual()
       throws IOException, ServletException {
     when(request.getRequestURI()).thenReturn("uri");
     when(request.getMethod()).thenReturn("POST");
@@ -68,7 +68,7 @@ public class StatelessCsrfFilterTest {
   }
 
   @Test
-  public void doFilterInternal_Should_callAccessDeniedHandler_When_csrfHeaderIsNull()
+  void doFilterInternal_Should_callAccessDeniedHandler_When_csrfHeaderIsNull()
       throws IOException, ServletException {
     when(request.getRequestURI()).thenReturn("uri");
     when(request.getMethod()).thenReturn("POST");
@@ -82,7 +82,7 @@ public class StatelessCsrfFilterTest {
   }
 
   @Test
-  public void doFilterInternal_Should_callAccessDeniedHandler_When_cookiesAreNull()
+  void doFilterInternal_Should_callAccessDeniedHandler_When_cookiesAreNull()
       throws IOException, ServletException {
     when(request.getRequestURI()).thenReturn("uri");
     when(request.getMethod()).thenReturn("POST");
@@ -95,9 +95,8 @@ public class StatelessCsrfFilterTest {
   }
 
   @Test
-  public void
-      doFilterInternal_Should_callAccessDeniedHandler_When_csrfHeaderIsNotEqualToCookieToken()
-          throws IOException, ServletException {
+  void doFilterInternal_Should_callAccessDeniedHandler_When_csrfHeaderIsNotEqualToCookieToken()
+      throws IOException, ServletException {
     when(request.getRequestURI()).thenReturn("uri");
     when(request.getMethod()).thenReturn("POST");
     when(request.getHeader(CSRF_HEADER)).thenReturn("csrfHeaderTokenValue");

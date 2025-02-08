@@ -6,9 +6,9 @@ import de.caritas.cob.consultingtypeservice.api.model.TopicMultilingualDTO;
 import de.caritas.cob.consultingtypeservice.api.service.TopicFeatureAuthorisationService;
 import de.caritas.cob.consultingtypeservice.api.service.TopicServiceFacade;
 import de.caritas.cob.consultingtypeservice.generated.api.controller.TopicadminApi;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
-import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "topic-controller")
 @Slf4j
+@Tag(name = "topic-controller")
 public class TopicAdminController implements TopicadminApi {
 
   private final @NonNull TopicServiceFacade topicServiceFacade;
