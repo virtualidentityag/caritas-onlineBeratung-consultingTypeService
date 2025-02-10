@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for consulting type API requests. */
@@ -32,6 +34,10 @@ public class TopicController implements TopicApi {
    * @return {@link ResponseEntity} containing {@link List} of {@link TopicDTO}
    */
   @Override
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = {"/topic", "/topic/"},
+      produces = {"application/json"})
   public ResponseEntity<List<TopicDTO>> getAllTopics() {
     var topics = topicServiceFacade.getAllTopics();
     return !CollectionUtils.isEmpty(topics)
@@ -40,6 +46,10 @@ public class TopicController implements TopicApi {
   }
 
   @Override
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = {"/topic/public", "/topic/public/"},
+      produces = {"application/json"})
   public ResponseEntity<List<TopicDTO>> getAllActiveTopics() {
     var topics = topicServiceFacade.getAllActiveTopics();
     return !CollectionUtils.isEmpty(topics)
