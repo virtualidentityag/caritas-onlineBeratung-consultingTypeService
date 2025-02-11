@@ -36,7 +36,7 @@ public class TopicAdminController implements TopicadminApi {
   @Override
   @PreAuthorize("hasAuthority('AUTHORIZATION_CREATE_TOPIC')")
   @RequestMapping(
-      method = RequestMethod.GET,
+      method = RequestMethod.POST,
       value = {"/topicadmin", "/topicadmin/"},
       produces = {"application/json"})
   public ResponseEntity<TopicMultilingualDTO> createTopic(
@@ -58,6 +58,10 @@ public class TopicAdminController implements TopicadminApi {
 
   @Override
   @PreAuthorize("hasAuthority('AUTHORIZATION_GET_ALL_TOPICS')")
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = {"/topicadmin", "/topicadmin/"},
+      produces = {"application/json"})
   public ResponseEntity<List<TopicDTO>> getAllTopicsAsAdmin() {
     final var topics = topicServiceFacade.getAllTopics();
     return !CollectionUtils.isEmpty(topics)
