@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,6 +35,10 @@ public class TopicAdminController implements TopicadminApi {
 
   @Override
   @PreAuthorize("hasAuthority('AUTHORIZATION_CREATE_TOPIC')")
+  @RequestMapping(
+      method = RequestMethod.POST,
+      value = {"/topicadmin", "/topicadmin/"},
+      produces = {"application/json"})
   public ResponseEntity<TopicMultilingualDTO> createTopic(
       @Valid final TopicMultilingualDTO topicMultilingualDTO) {
     log.info("Creating topic by user {} ", authenticatedUser.getUsername());
@@ -52,6 +58,10 @@ public class TopicAdminController implements TopicadminApi {
 
   @Override
   @PreAuthorize("hasAuthority('AUTHORIZATION_GET_ALL_TOPICS')")
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = {"/topicadmin", "/topicadmin/"},
+      produces = {"application/json"})
   public ResponseEntity<List<TopicDTO>> getAllTopicsAsAdmin() {
     final var topics = topicServiceFacade.getAllTopics();
     return !CollectionUtils.isEmpty(topics)
