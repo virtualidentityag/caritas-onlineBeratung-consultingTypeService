@@ -1,12 +1,13 @@
 package de.caritas.cob.consultingtypeservice.api.exception.httpresponses;
 
 import de.caritas.cob.consultingtypeservice.api.service.LogService;
+import java.io.Serial;
 import java.util.function.Consumer;
 
 /** Represents the exception for an internal server error - status code 500. */
 public class InternalServerErrorException extends CustomHttpStatusException {
 
-  private static final long serialVersionUID = 6051508644381775936L;
+  @Serial private static final long serialVersionUID = 6051508644381775936L;
 
   /**
    * InternalServerErrorException exception.

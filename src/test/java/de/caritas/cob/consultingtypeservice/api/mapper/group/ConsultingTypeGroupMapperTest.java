@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class ConsultingTypeGroupMapperTest {
+class ConsultingTypeGroupMapperTest {
 
   @Test
-  public void mapConsultingTypeCoreDtoList_Should_MapIdAndDefaultTitle() throws IOException {
+  void mapConsultingTypeCoreDtoList_Should_MapIdAndDefaultTitle() throws IOException {
 
     ConsultingType consultingType = HelperMethods.getConsultingType();
     List<ConsultingType> consultingTypeList = Collections.singletonList(consultingType);

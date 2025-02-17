@@ -4,15 +4,17 @@ import de.caritas.cob.consultingtypeservice.api.exception.httpresponses.BadReque
 import de.caritas.cob.consultingtypeservice.api.exception.httpresponses.InternalServerErrorException;
 import de.caritas.cob.consultingtypeservice.api.exception.httpresponses.NotFoundException;
 import de.caritas.cob.consultingtypeservice.api.service.LogService;
+import jakarta.validation.ConstraintViolationException;
 import java.net.UnknownHostException;
-import javax.validation.ConstraintViolationException;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
@@ -30,8 +32,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @NoArgsConstructor
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
+@Slf4j
 public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
+  private static final String MESSAGE_CONSULTING_TYPE_SERVICE_API_PLACEHOLDER =
+      "ConsultingTypeService API: {} {]";
   private static final Exception EMPTY_EXCEPTION = new RuntimeException();
 
   /**
@@ -78,9 +83,9 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
   protected ResponseEntity<Object> handleHttpMessageNotReadable(
       final @NonNull HttpMessageNotReadableException ex,
       final @NonNull HttpHeaders headers,
-      final @NonNull HttpStatus status,
+      final HttpStatusCode status,
       final @NonNull WebRequest request) {
-    LogService.logWarning(status, ex);
+    log.warn(MESSAGE_CONSULTING_TYPE_SERVICE_API_PLACEHOLDER, status, ex.getStackTrace());
 
     return handleExceptionInternal(ex, null, headers, status, request);
   }
@@ -99,10 +104,10 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
   protected ResponseEntity<Object> handleMethodArgumentNotValid(
       final @NonNull MethodArgumentNotValidException ex,
       final @NonNull HttpHeaders headers,
-      final @NonNull HttpStatus status,
+      final HttpStatusCode status,
       final @NonNull WebRequest request) {
-    LogService.logWarning(status, ex);
 
+    log.warn(MESSAGE_CONSULTING_TYPE_SERVICE_API_PLACEHOLDER, status, ex.getStackTrace());
     return handleExceptionInternal(ex, null, headers, status, request);
   }
 

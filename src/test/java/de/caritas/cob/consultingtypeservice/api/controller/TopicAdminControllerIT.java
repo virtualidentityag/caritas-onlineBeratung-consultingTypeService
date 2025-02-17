@@ -1,11 +1,9 @@
 package de.caritas.cob.consultingtypeservice.api.controller;
 
 import static de.caritas.cob.consultingtypeservice.api.auth.UserRole.TOPIC_ADMIN;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,7 +12,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.google.common.collect.Lists;
 import de.caritas.cob.consultingtypeservice.ConsultingTypeServiceApplication;
+import de.caritas.cob.consultingtypeservice.api.auth.RoleAuthorizationAuthorityMapper;
 import de.caritas.cob.consultingtypeservice.api.auth.UserRole;
 import de.caritas.cob.consultingtypeservice.api.model.TopicMultilingualDTO;
 import de.caritas.cob.consultingtypeservice.api.model.TopicStatus;
@@ -24,18 +24,15 @@ import de.caritas.cob.consultingtypeservice.api.util.JsonConverter;
 import de.caritas.cob.consultingtypeservice.api.util.MultilingualTopicTestDataBuilder;
 import de.caritas.cob.consultingtypeservice.tenantservice.generated.web.model.RestrictedTenantDTO;
 import de.caritas.cob.consultingtypeservice.tenantservice.generated.web.model.Settings;
+import de.caritas.cob.consultingtypeservice.testHelper.MongoTestInitializer;
 import de.caritas.cob.consultingtypeservice.testHelper.TopicPathConstants;
+import java.time.Instant;
 import java.util.Map;
-import org.assertj.core.util.Maps;
+import java.util.Set;
 import org.assertj.core.util.Sets;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
-import org.keycloak.adapters.spi.KeycloakAccount;
-import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.AccessToken;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -43,14 +40,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest(classes = ConsultingTypeServiceApplication.class)
+@SpringBootTest
+@ContextConfiguration(
+    classes = ConsultingTypeServiceApplication.class,
+    initializers = MongoTestInitializer.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 @TestPropertySource(properties = "feature.multitenancy.with.single.domain.enabled=true")
 class TopicAdminControllerIT {
 
@@ -109,7 +112,7 @@ class TopicAdminControllerIT {
     final Authentication authentication = givenMockAuthentication(UserRole.TOPIC_ADMIN);
     mockMvc
         .perform(
-            put(String.format(TopicPathConstants.PATH_PUT_TOPIC_BY_ID, "1"))
+            put(TopicPathConstants.PATH_PUT_TOPIC_BY_ID.formatted("1"))
                 .with(authentication(authentication))
                 .contentType(APPLICATION_JSON)
                 .content(payload)
@@ -139,7 +142,7 @@ class TopicAdminControllerIT {
     final Authentication authentication = givenMockAuthentication(UserRole.TOPIC_ADMIN);
     mockMvc
         .perform(
-            put(String.format(TopicPathConstants.PATH_PUT_TOPIC_BY_ID, "1"))
+            put(TopicPathConstants.PATH_PUT_TOPIC_BY_ID.formatted("1"))
                 .with(authentication(authentication))
                 .contentType(APPLICATION_JSON)
                 .content(payload)
@@ -167,15 +170,16 @@ class TopicAdminControllerIT {
   }
 
   @Test
-  void createTopic_Should_returnForbidden_When_calledWithValidCreateParamsButAsUnauthenticatedUser()
-      throws Exception {
+  void
+      createTopic_Should_returnUnauthorized_When_calledWithValidCreateParamsButAsUnauthenticatedUser()
+          throws Exception {
     final EasyRandom easyRandom = new EasyRandom();
     final TopicMultilingualDTO topicDTO = easyRandom.nextObject(TopicMultilingualDTO.class);
     final String payload = JsonConverter.convertToJson(topicDTO);
     mockMvc
         .perform(
             post(TopicPathConstants.ADMIN_ROOT_PATH).content(payload).contentType(APPLICATION_JSON))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -238,11 +242,11 @@ class TopicAdminControllerIT {
   }
 
   @Test
-  void save_Should_ReturnForbidden_IfUserIsAuthenticatedButDoesNotHavePermission()
+  void save_Should_ReturnUnauthorized_IfUserIsAuthenticatedButDoesNotHavePermission()
       throws Exception {
     mockMvc
         .perform(post(TopicPathConstants.ADMIN_ROOT_PATH).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -279,7 +283,7 @@ class TopicAdminControllerIT {
     final AuthenticationMockBuilder builder = new AuthenticationMockBuilder();
     mockMvc
         .perform(
-            get(String.format(TopicPathConstants.ADMIN_PATH_GET_TOPIC_BY_ID, 1))
+            get(TopicPathConstants.ADMIN_PATH_GET_TOPIC_BY_ID.formatted(1))
                 .with(authentication(builder.withUserRole(TOPIC_ADMIN.getValue()).build()))
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -291,30 +295,41 @@ class TopicAdminControllerIT {
   }
 
   @Test
-  void getTopicList_Should_ReturnForbidden_When_UserIsNotAuthenticated() throws Exception {
+  void getTopicList_Should_ReturnUnauthorized_When_UserIsNotAuthenticated() throws Exception {
     mockMvc
         .perform(
             get(TopicPathConstants.ADMIN_PATH_GET_TOPIC_LIST).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   private Authentication givenMockAuthentication(final UserRole userRole) {
-    final var securityContext = mock(RefreshableKeycloakSecurityContext.class);
-    when(securityContext.getTokenString()).thenReturn("tokenString");
-    final var token = mock(AccessToken.class, Mockito.RETURNS_DEEP_STUBS);
-    when(securityContext.getToken()).thenReturn(token);
-    givenOtherClaimsAreDefinedForToken(token);
-    final KeycloakAccount mockAccount =
-        new SimpleKeycloakAccount(() -> "user", Sets.newHashSet(), securityContext);
+    Map<String, Object> claims =
+        Map.of(
+            "sub",
+            "user",
+            "roles",
+            Set.of(userRole.getValue()),
+            "iss",
+            "https://issuer.example.com",
+            "exp",
+            Instant.now().plusSeconds(3600).getEpochSecond(),
+            "userId",
+            "mockedUserId");
 
-    Authentication authentication =
-        new AuthenticationMockBuilder().withUserRole(userRole.getValue()).build();
-    return new KeycloakAuthenticationToken(mockAccount, true, authentication.getAuthorities());
-  }
+    Jwt jwt =
+        new Jwt(
+            "mockedTokenValue",
+            Instant.now(),
+            Instant.now().plusSeconds(3600),
+            Map.of("alg", "HS256"),
+            claims);
 
-  private void givenOtherClaimsAreDefinedForToken(final AccessToken token) {
-    final Map<String, Object> claimMap = Maps.newHashMap("username", "test");
-    claimMap.put("userId", "some userid");
-    when(token.getOtherClaims()).thenReturn(claimMap);
+    RoleAuthorizationAuthorityMapper roleAuthorizationAuthorityMapper =
+        new RoleAuthorizationAuthorityMapper();
+    Set<String> roleNames = Sets.newHashSet();
+    roleNames.add(userRole.getValue());
+    var authorities = roleAuthorizationAuthorityMapper.mapAuthorities(roleNames);
+
+    return new JwtAuthenticationToken(jwt, Lists.newArrayList(authorities));
   }
 }
